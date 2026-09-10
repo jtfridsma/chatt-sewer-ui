@@ -1,18 +1,7 @@
 // Floating CSUI control: circular launcher + popover panel.
 // Requires markup injected by src/scripts/components/theme-toggle.js.
 
-@keyframes csui-launcher-glyph-enable {
-    0%,
-    100% {
-        transform: rotate(0deg);
-    }
-
-    50% {
-        transform: rotate(-15deg);
-    }
-}
-
-@keyframes csui-launcher-glyph-disable {
+@keyframes csui-launcher-handle-disable {
     0%,
     100% {
         transform: rotate(0deg);
@@ -101,32 +90,40 @@ html.csui-theme {
         flex: none;
     }
 
-    .csui-control__launcher-icon-background {
-        fill: #004360;
-        transition: fill var(--chatt-transition-fast);
+    .csui-control__launcher-icon-base {
+        fill: var(--chatt-color-text-light);
     }
 
-    .csui-control__launcher-icon-glyph {
+    // Move the wave within the stationary circular mask (SVG viewBox units).
+    .csui-control__launcher-icon-wave {
+        transform: translate(-82px, 82px);
+        transition: transform 500ms ease-in-out;
+    }
+
+    &[data-csui-enabled] .csui-control__launcher-icon-wave {
+        transform: translate(0, 0);
+
+        // Fill on first render, using the same interruptible transition as toggles.
+        @starting-style {
+            transform: translate(-82px, 82px);
+        }
+    }
+
+    .csui-control__launcher-icon-handle {
         fill: #ffffff;
         transition: fill var(--chatt-transition-fast);
         transform-box: fill-box;
         transform-origin: 76% 50%;
     }
 
-    &[data-csui-enabled] .csui-control__launcher-icon-glyph {
-        animation: csui-launcher-glyph-enable 260ms ease-in-out;
-    }
-
-    &:not([data-csui-enabled]) .csui-control__launcher-icon-glyph {
-        animation: csui-launcher-glyph-disable 260ms ease-in-out;
-    }
-
-    &:not([data-csui-enabled]) .csui-control__launcher-icon-background {
-        fill: var(--chatt-color-text-muted);
-    }
-
-    &:not([data-csui-enabled]) .csui-control__launcher-icon-glyph {
+    &:not([data-csui-enabled]) .csui-control__launcher-icon-handle {
         fill: var(--chatt-color-surface);
+    }
+
+    &:not([data-csui-enabled])
+        .csui-control[data-csui-interacted='true']
+        .csui-control__launcher-icon-handle {
+        animation: csui-launcher-handle-disable 300ms ease-in-out;
     }
 
     // --------------------

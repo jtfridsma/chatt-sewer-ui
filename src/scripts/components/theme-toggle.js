@@ -111,6 +111,8 @@ export function addThemeToggle(ctx) {
     // Toggle enabled state
     toggle.addEventListener('change', () => {
         const next = !!toggle.checked;
+        // Allow handle motion only after interaction, never while restoring state.
+        root.setAttribute('data-csui-interacted', 'true');
         setThemeEnabled(next);
         persistThemeEnabled(next);
 
@@ -144,10 +146,17 @@ function getMarkup() {
       aria-haspopup="dialog"
       aria-expanded="false"
     >
-      <svg class="csui-control__launcher-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-        <path class="csui-control__launcher-icon-background" d="M0 24c0 13.255 10.745 24 24 24s24-10.745 24-24S37.255 0 24 0 0 10.745 0 24"/>
-        <path class="csui-control__launcher-icon-glyph" d="M32 16a7.98 7.98 0 0 0-6.398 3.2c-.626.834-1.542 1.467-2.584 1.467H9.333a2.667 2.667 0 0 0-2.666 2.666v1.334a2.667 2.667 0 0 0 2.666 2.666h13.685c1.042 0 1.958.633 2.584 1.467A8 8 0 1 0 32 16"/>
+      <svg class="csui-control__launcher-icon" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path class="csui-control__launcher-icon-base" d="M1.90735e-06 35.9999C1.90735e-06 55.8821 16.1177 71.9998 35.9999 71.9998C55.8821 71.9998 71.9998 55.8821 71.9998 35.9999C71.9998 16.1177 55.8821 0 35.9999 0C16.1177 0 1.90735e-06 16.1177 1.90735e-06 35.9999Z" fill="#9ca3af"/>
+        <mask id="wave-mask" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+          <path class="csui-control__launcher-icon-wave-mask" d="M1.90735e-06 35.9999C1.90735e-06 55.8821 16.1177 71.9998 35.9999 71.9998C55.8821 71.9998 71.9998 55.8821 71.9998 35.9999C71.9998 16.1177 55.8821 0 35.9999 0C16.1177 0 1.90735e-06 16.1177 1.90735e-06 35.9999Z" fill="#9ca3af"/>
+        </mask>
+        <g mask="url(#wave-mask)">
+          <path class="csui-control__launcher-icon-wave" d="M132 -10.0032C136 -10.0032 140.001 -5.20337 144.001 -5.20337V71.9998H0.000976562V4.15015H0V-5.20337C3.99991 -5.20337 8.00106 -10.0031 12.001 -10.0032C16.0008 -10.003 20.0011 -5.20341 24.001 -5.20337C28.0007 -5.20356 32.0012 -10.0029 36.001 -10.0032C40.0005 -10.0027 44.0005 -5.20395 48 -5.20337C51.9997 -5.20341 56.0003 -10.0027 60 -10.0032C63.9999 -10.0032 68.0011 -5.20343 72.001 -5.20337C76.0008 -5.20376 80.0012 -10.0032 84.001 -10.0032C88.0007 -10.0028 92.0012 -5.20341 96.001 -5.20337C100 -5.20383 104 -10.0026 108 -10.0032C112 -10.0029 116 -5.20369 120 -5.20337C124 -5.20341 128 -10.0029 132 -10.0032Z" fill="#004360"/>
+        </g>
+        <path class="csui-control__launcher-icon-handle" d="M48 23.999C54.6274 23.9991 60 29.3726 60 36C59.9997 42.6272 54.6272 47.9999 48 48C43.1577 48 38.9882 45.1301 37.0918 41H14C11.791 41 10.0003 39.2089 10 37V35C10 32.7909 11.7909 31 14 31H37.0918C38.988 26.8695 43.1574 23.999 48 23.999Z" fill="white"/>
       </svg>
+
       <span id="${ERROR_BADGE_ID}" class="csui-control__badge" aria-hidden="true">
         <span id="${BADGE_ICON_ID}" class="material-symbols-rounded csui-control__badge-icon">warning</span>
       </span>
