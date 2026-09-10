@@ -43,8 +43,9 @@ export function normalizeReadings(readings) {
 }
 
 export function formatCurrency(value) {
+    if (value === null || value === undefined || String(value).trim() === '') return 'Unavailable';
     const number = Number(value);
-    return CURRENCY_FORMATTER.format(Number.isFinite(number) ? number : 0);
+    return Number.isFinite(number) ? CURRENCY_FORMATTER.format(number) : 'Unavailable';
 }
 
 export function formatOptionalCurrency(value) {

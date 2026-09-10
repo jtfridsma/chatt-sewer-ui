@@ -4,7 +4,7 @@ export function normalizeAccount(raw) {
     // per-account balance first so one account's debt cannot make another account
     // appear due or active.
     const accountAmountDue = raw.PTntvfBalance ?? raw.AmtToPay;
-    const currentBalance = numberValue(accountAmountDue);
+    const currentBalance = optionalNumber(accountAmountDue);
     const totalAmountDue = currentBalance;
     const lastPaymentDate = stringValue(raw.LastPayDate);
     const explicitInactive = raw.PTntActive === 0 || raw.PTntActive === '0';
@@ -35,6 +35,7 @@ export function normalizeAccount(raw) {
         isPastInactive,
         explicitPastDue,
         hasPaymentDue: totalAmountDue > 0,
+        hasKnownBalance: currentBalance !== undefined,
     });
 
     return {
@@ -58,6 +59,7 @@ export function normalizeAccount(raw) {
             lastPaymentIsVeryOld,
             explicitPastDue,
             hasPaymentDue: totalAmountDue > 0,
+            hasKnownBalance: currentBalance !== undefined,
         }),
         premiseId: stringValue(raw.PTntPremiseID),
         tenantCounter: stringValue(raw.PTntTenantCounter),
@@ -225,8 +227,11 @@ export function numberValue(value) {
 }
 
 export function optionalNumber(value) {
-    if (value === null || value === undefined || value === '') return undefined;
-    return numberValue(value);
+    if (typeof value !== 'number' && typeof value !== 'string') return undefined;
+    const text = String(value).replace(/[$,]/g, '').trim();
+    if (!text) return undefined;
+    const parsed = Number(text);
+    return Number.isFinite(parsed) ? parsed : undefined;
 }
 
 export function booleanValue(value) {
@@ -245,9 +250,15 @@ export function parseDateTime(value) {
     return Number.isNaN(parsed.getTime()) ? 0 : parsed.getTime();
 }
 
-export function getAccountStatus({ isPastInactive, explicitPastDue, hasPaymentDue }) {
+export function getAccountStatus({
+    isPastInactive,
+    explicitPastDue,
+    hasPaymentDue,
+    hasKnownBalance = true,
+}) {
     if (isPastInactive) return { type: 'inactive', label: 'Inactive' };
     if (explicitPastDue) return { type: 'past-due', label: 'Payment past due' };
+    if (!hasKnownBalance) return { type: 'unavailable', label: 'Unavailable' };
     if (hasPaymentDue) return { type: 'due', label: 'Payment due' };
     return { type: 'current', label: 'Current' };
 }
@@ -257,9 +268,11 @@ function getAccountStatusReason({
     lastPaymentIsVeryOld,
     explicitPastDue,
     hasPaymentDue,
+    hasKnownBalance,
 }) {
     if (explicitInactive) return 'Portal marks this account inactive.';
     if (explicitPastDue) return 'Portal indicates a past-due or delinquent amount.';
+    if (!hasKnownBalance) return 'Account balance is unavailable.';
     if (hasPaymentDue) return 'Amount due is greater than zero.';
     if (lastPaymentIsVeryOld)
         return 'No balance or amount due and no payment for roughly 18 months.';

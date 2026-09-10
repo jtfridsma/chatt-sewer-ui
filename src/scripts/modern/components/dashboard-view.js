@@ -434,6 +434,14 @@ function renderAccountOverview({ account, flags }) {
                         <strong>${formatCurrency(account.totalAmountDue)}</strong>
                     </div>
                     ${
+                        !Number.isFinite(account.totalAmountDue)
+                            ? `<p class="notice-inline" role="status">
+                                ${renderIcon('info')}
+                                Balance unavailable. We couldn’t read your account balance. Check the original dashboard before making a payment.
+                            </p>`
+                            : ''
+                    }
+                    ${
                         canPay
                             ? `<button class="primary-action" type="button" data-action="pay-now">Pay Now</button>`
                             : ''
@@ -830,6 +838,7 @@ function getStatusIconName(account) {
     if (statusType === 'due') return 'payments';
     if (statusType === 'past-due') return 'warning';
     if (statusType === 'inactive') return 'block';
+    if (statusType === 'unavailable') return 'info';
     return 'check_circle';
 }
 

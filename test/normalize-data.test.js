@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { formatCurrency } from '../src/scripts/modern/components/dashboard-format.js';
 import assert from 'node:assert/strict';
 
 import {
@@ -204,4 +205,31 @@ test('reconciles meter labels that differ only by the legacy display prefix', ()
             ],
         },
     ]);
+});
+
+test('unknown balances stay unavailable instead of current or inferred inactive', () => {
+    for (const value of [undefined, null, '', '  ', 'invalid', '$', NaN, Infinity, false, [], {}]) {
+        for (const field of ['PTntvfBalance', 'AmtToPay']) {
+            const account = normalizeAccount({
+                [field]: value,
+                TotalAmtDue: 99,
+                LastPayDate: '2020-01-01',
+            });
+            assert.equal(account.currentBalance, undefined);
+            assert.equal(account.totalAmountDue, undefined);
+            assert.equal(account.statusType, 'unavailable');
+            assert.equal(account.statusLabel, 'Unavailable');
+            assert.equal(account.pastInactive, false);
+            assert.equal(account.statusReason, 'Account balance is unavailable.');
+            assert.equal(formatCurrency(account.currentBalance), 'Unavailable');
+        }
+    }
+    for (const value of [0, '0', '$0.00']) {
+        const account = normalizeAccount({ AmtToPay: value });
+        assert.equal(account.statusType, 'current');
+        assert.equal(formatCurrency(account.totalAmountDue), '$0.00');
+    }
+    assert.equal(normalizeAccount({ AmtToPay: '$12.50' }).totalAmountDue, 12.5);
+    assert.equal(normalizeAccount({ PTntActive: 0 }).statusType, 'inactive');
+    assert.equal(normalizeAccount({ IsPastDue: true }).statusType, 'past-due');
 });
