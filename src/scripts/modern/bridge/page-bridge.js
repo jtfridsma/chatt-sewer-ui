@@ -36,6 +36,9 @@ function installBridge() {
     let unwatchScope = [];
     const followUpTimeoutIds = new Set();
     const fallbackData = createFallbackDataStore();
+    // Keep unverified changes across bridge restarts: only a page reload fetches
+    // authoritative settings. The portal mutates these models before saving.
+    const settingChanges = new Map();
 
     function start() {
         active = true;
@@ -93,6 +96,20 @@ function installBridge() {
         ensureRelatedData(scope, selectedRaw, fallbackData);
 
         const state = buildDashboardState(scope, fallbackData);
+        for (const account of [...state.accounts, state.selectedAccount]) {
+            if (!account) continue;
+            const changes = settingChanges.get(
+                account.accountKey ||
+                    account.accountNumber ||
+                    [account.premiseId, account.tenantCounter].filter(Boolean).join(':')
+            );
+            if (!changes) continue;
+            account.settingStatus = {};
+            for (const [field, change] of Object.entries(changes)) {
+                account[field] = change.previous;
+                account.settingStatus[field] = change.status;
+            }
+        }
         const fingerprint = getStateFingerprint(state);
         if (!force && fingerprint === lastStateFingerprint) return;
 
@@ -239,28 +256,57 @@ function installBridge() {
         const detail = event?.detail || {};
         const action = String(detail.action || '');
         const scope = getAccountScope();
-        if (!scope || !action) return;
+        if (!active || !scope || !action) return;
 
         const selected = Array.isArray(scope.userSelections) ? scope.userSelections[0] : null;
+        const setting = {
+            'set-paperless-billing': ['NameEBillConsent', 'paperlessBilling', 'changePaperless'],
+            'set-auto-pay': ['AutoPay', 'autoPay', 'setAutoPayment'],
+        }[action];
+        if (!selected || !Array.isArray(setting) || typeof detail.enabled !== 'boolean') return;
+        const [rawField, field, method] = setting;
+        const key = getRawAccountKey(selected);
+        const changes = settingChanges.get(key) || {};
+        if (changes[field]?.status === 'unconfirmed') return;
+        const previous = selected[rawField];
+        const change = { previous: normalizeAccount(selected)[field], status: 'unconfirmed' };
+        changes[field] = change;
+        settingChanges.set(key, changes);
+
+        const fail = () => {
+            selected[rawField] = previous;
+            change.status = 'error';
+        };
 
         try {
             runInAngular(scope, () => {
-                if (action === 'set-paperless-billing' && selected) {
-                    selected.NameEBillConsent = detail.enabled === true;
-                    scope.changePaperless?.();
-                    return;
-                }
-
-                if (action === 'set-auto-pay' && selected) {
-                    selected.AutoPay = detail.enabled === true;
-                    scope.setAutoPayment?.();
-                    return;
+                // Catch inside $apply: Angular sends callback exceptions to its
+                // exception handler instead of reliably rethrowing them.
+                try {
+                    if (typeof scope[method] !== 'function')
+                        throw new Error('Missing portal method');
+                    selected[rawField] = detail.enabled;
+                    const result = scope[method]();
+                    // Current portal methods return nothing, discard request errors,
+                    // and autopay can open a cancellable modal before redirecting.
+                    // Even a resolved promise is not evidence of a saved setting.
+                    if (result && typeof result.then === 'function') {
+                        Promise.resolve(result).catch(() => {
+                            fail();
+                            scope.$applyAsync?.();
+                            publishState({ force: false });
+                        });
+                    }
+                } catch {
+                    fail();
                 }
             });
         } catch {
-            // Legacy behavior owns the workflow; failures are surfaced by the isolated client timeout.
+            fail();
         }
 
+        // Also reset the checkbox after repeated failures with identical state.
+        publishState({ force: true });
         scheduleFollowUpPublishes();
     }
 
@@ -649,6 +695,8 @@ function getStateFingerprint(state) {
             account?.lastStatementBalance,
             account?.paperlessBilling,
             account?.autoPay,
+            account?.settingStatus?.paperlessBilling,
+            account?.settingStatus?.autoPay,
             account?.active,
             account?.pastInactive,
             account?.inactiveStatusInferred,

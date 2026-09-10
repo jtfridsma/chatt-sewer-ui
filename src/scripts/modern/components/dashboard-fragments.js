@@ -61,15 +61,23 @@ export function renderHeader() {
 
 export function renderSettingsToggles({ selected, flags }) {
     const account = selected || {};
-    const paperlessDisabled = flags.allowPaperlessChange === false;
-    const autoPayDisabled = flags.allowRecurring === false;
+    const status = account.settingStatus || {};
+    const paperlessDisabled =
+        flags.allowPaperlessChange === false || status.paperlessBilling === 'unconfirmed';
+    const autoPayDisabled = flags.allowRecurring === false || status.autoPay === 'unconfirmed';
+    const hint = (field) => {
+        if (status[field] === 'unconfirmed')
+            return 'Not confirmed. Complete any portal steps, then reload to check.';
+        if (status[field] === 'error') return 'Could not change this setting. Please try again.';
+        return account[field] ? 'On' : 'Off';
+    };
 
     return `
         <label class="setting-toggle ${paperlessDisabled ? 'is-disabled' : ''}">
             ${renderIcon('receipt_long', 'setting-toggle__icon')}
             <span>
                 <span class="setting-toggle__title">Paperless Billing</span>
-                <span class="setting-toggle__hint">${account.paperlessBilling ? 'On' : 'Off'}</span>
+                <span class="setting-toggle__hint" role="status">${hint('paperlessBilling')}</span>
             </span>
             <input type="checkbox" data-toggle-setting="paperless" ${account.paperlessBilling ? 'checked' : ''} ${paperlessDisabled ? 'disabled' : ''} />
             <span class="switch-ui" aria-hidden="true"></span>
@@ -78,7 +86,7 @@ export function renderSettingsToggles({ selected, flags }) {
             ${renderIcon('autorenew', 'setting-toggle__icon')}
             <span>
                 <span class="setting-toggle__title">Automatic Payment Plan</span>
-                <span class="setting-toggle__hint">${account.autoPay ? 'On' : 'Off'}</span>
+                <span class="setting-toggle__hint" role="status">${hint('autoPay')}</span>
             </span>
             <input type="checkbox" data-toggle-setting="autopay" ${account.autoPay ? 'checked' : ''} ${autoPayDisabled ? 'disabled' : ''} />
             <span class="switch-ui" aria-hidden="true"></span>
