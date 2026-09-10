@@ -157,7 +157,9 @@ function initializeModernDashboard() {
             loading: {
                 statements:
                     flags.statementsPending === true ||
-                    (withinLoadingWindow && statements.length === 0),
+                    (flags.statementsLoaded !== true &&
+                        withinLoadingWindow &&
+                        statements.length === 0),
                 waterMeters:
                     flags.waterMetersPending === true ||
                     (withinLoadingWindow &&
@@ -179,6 +181,7 @@ function initializeModernDashboard() {
         const remaining = Math.max(250, RELATED_DATA_LOADING_MS - elapsed + 50);
         loadingRefreshId = window.setTimeout(() => {
             loadingRefreshId = null;
+            view.render(withRelatedLoadingState(state));
             dataAdapter.refresh();
         }, remaining);
     }

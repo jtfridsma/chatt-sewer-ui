@@ -619,7 +619,7 @@ function renderStatement(statement) {
         <li>
             ${
                 statement.url
-                    ? `<a href="${escapeAttr(statement.url)}">${renderIcon('description', 'statement-list__icon')}<span class="statement-list__label">${escapeHtml(label)}</span></a>`
+                    ? `<a href="${escapeAttr(statement.url)}" target="_blank" aria-label="${escapeAttr(label)} (opens in a new tab)">${renderIcon('description', 'statement-list__icon')}<span class="statement-list__label">${escapeHtml(label)}</span></a>`
                     : `<span>${renderIcon('description', 'statement-list__icon')}<span class="statement-list__label">${escapeHtml(label)}</span></span>`
             }
         </li>

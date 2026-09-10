@@ -7,7 +7,6 @@ import {
     normalizeAccount,
     normalizeMeterSeries,
     reconcileMeterSeries,
-    reconcileStatements,
     stringValue,
 } from './normalize-data.js';
 import { formatStatementLabel, parseStatementDate, parseStatementKey } from './statement-data.js';
@@ -49,6 +48,7 @@ function installBridge() {
     function stop() {
         active = false;
         revision = 0;
+        fallbackData.statementGeneration += 1;
         lastStateFingerprint = '';
         if (timer) {
             window.clearInterval(timer);
@@ -85,6 +85,11 @@ function installBridge() {
 
         observeStateSources(scope);
         const selectedRaw = getSelectedRawAccount(scope);
+        const accountKey = getRawAccountKey(selectedRaw);
+        if (fallbackData.statementAccountKey !== accountKey) {
+            fallbackData.statementAccountKey = accountKey;
+            fallbackData.statementGeneration += 1;
+        }
         ensureRelatedData(scope, selectedRaw, fallbackData);
 
         const state = buildDashboardState(scope, fallbackData);
@@ -307,6 +312,8 @@ function installBridge() {
 function createFallbackDataStore() {
     return {
         statementsByAccount: new Map(),
+        statementAccountKey: '',
+        statementGeneration: 0,
         waterMetersByAccount: new Map(),
         waterMeterCountsByAccount: new Map(),
         angularWaterMetersByAccount: new Map(),
@@ -322,21 +329,17 @@ function requestStatements(scope, account, accountKey, store) {
     const requestKey = `statements:${accountKey}`;
     if (!canScheduleFallback(store, requestKey)) return;
 
-    try {
-        if (typeof scope.getStatementData === 'function') {
-            // The modern dashboard renders the complete history, so request the legacy app's
-            // expanded collection up front instead of recreating its client-side "More" state.
-            runInAngular(scope, () => scope.getStatementData(true));
-        }
-    } catch {
-        // The fetch fallback below is intentionally independent of Angular's promise chain.
-    }
+    const generation = store.statementGeneration;
+    const isCurrent = () =>
+        store.statementGeneration === generation &&
+        getRawAccountKey(getSelectedRawAccount(scope)) === accountKey;
 
     scheduleFallbackRequest(
         store,
         requestKey,
-        () => hasCurrentAccountData(scope, accountKey, 'statements'),
+        () => false,
         async () => {
+            if (!isCurrent()) return;
             const items = await fetchSearchArray([
                 ['format', 'json'],
                 ['viewID', '4'],
@@ -346,7 +349,7 @@ function requestStatements(scope, account, accountKey, store) {
                 ['clientID2', getClientID()],
                 ['NumberOfStatements', scope.numberOfExpandedStatements || 20],
             ]);
-            store.statementsByAccount.set(accountKey, items);
+            if (isCurrent()) store.statementsByAccount.set(accountKey, items);
         }
     );
 }
@@ -536,18 +539,11 @@ function buildDashboardState(scope, fallbackData) {
     const selectedAccount =
         normalizeAccount(selectedRaw) || accounts.find((account) => account.accountNumber) || null;
 
-    const scopeStatements = Array.isArray(scope.statements)
-        ? normalizeStatements(scope.statements)
-        : [];
+    // Angular and DOM collections have no account ownership metadata. Only the
+    // account-scoped request can establish which statements belong here.
     const hasFallbackStatements =
         !!selectedRawKey && fallbackData?.statementsByAccount?.has(selectedRawKey);
-    const fallbackStatements = normalizeStatements(
-        fallbackData?.statementsByAccount?.get(selectedRawKey)
-    );
-    const reconciledStatements = reconcileStatements(scopeStatements, fallbackStatements);
-    const statements = reconciledStatements.length
-        ? reconciledStatements
-        : normalizeStatementLinks();
+    const statements = normalizeStatements(fallbackData?.statementsByAccount?.get(selectedRawKey));
 
     const rawScopeWaterMeters = normalizeMeterSeries(scope.waterMeterData);
     const accountScopedWaterMeters = excludeForeignMeterSeries(
@@ -594,6 +590,7 @@ function buildDashboardState(scope, fallbackData) {
             moreMeters: scope.moreMeters === true,
             expectedWaterMeterCount,
             showWaterConsumptionGraph: scope.showWaterConsumptionGraph === true,
+            statementsLoaded: hasFallbackStatements,
             statementsPending:
                 selectedRawKey && fallbackData?.pending?.has(`statements:${selectedRawKey}`),
             waterMetersPending:
@@ -606,14 +603,7 @@ function buildDashboardState(scope, fallbackData) {
             hasWaterMeterData: Array.isArray(scope.waterMeterData),
             waterMeterCount: waterMeters.length,
             expectedWaterMeterCount,
-            statementSource:
-                hasFallbackStatements && scopeStatements.length
-                    ? 'reconciled'
-                    : hasFallbackStatements
-                      ? 'fallback'
-                      : scopeStatements.length
-                        ? 'angular'
-                        : 'dom',
+            statementSource: hasFallbackStatements ? 'fallback' : 'pending',
             waterMeterSource:
                 hasFallbackWaterMeters && scopeWaterMeters.length
                     ? 'reconciled'
@@ -703,16 +693,12 @@ function getRawAccountKey(raw) {
 function normalizeStatements(rawStatements) {
     if (!Array.isArray(rawStatements)) return [];
 
-    const legacyLinksByKey = getStatementLinksByKey();
-
     return rawStatements
         .map((item) => {
             if (!item || typeof item !== 'object') return null;
             const statementKey = getStatementKey(item);
-            const legacyLink = statementKey ? legacyLinksByKey.get(statementKey) : null;
-            const url = getStatementUrl(item, statementKey) || legacyLink?.url || '';
-            const legacyLabel =
-                getStatementLabel(item) || legacyLink?.label || getStatementDateSource(item) || url;
+            const url = getStatementUrl(item, statementKey) || '';
+            const legacyLabel = getStatementLabel(item) || getStatementDateSource(item) || url;
             const label = formatStatementLabel(legacyLabel || url);
             return {
                 label,
@@ -721,32 +707,6 @@ function normalizeStatements(rawStatements) {
             };
         })
         .filter((item) => item && (item.label || item.url));
-}
-
-function getStatementLinksByKey() {
-    return new Map(
-        normalizeStatementLinks()
-            .filter((statement) => statement.statementKey)
-            .map((statement) => [statement.statementKey, statement])
-    );
-}
-
-function normalizeStatementLinks() {
-    const links = Array.from(document.querySelectorAll('a[href*="StatementView.aspx?StmtKey"]'));
-    return links
-        .map((link) => {
-            const legacyLabel = stringValue(
-                link.textContent || link.getAttribute('ng-bind-template')
-            );
-            return {
-                label: formatStatementLabel(legacyLabel),
-                url: stringValue(link.getAttribute('href')),
-                statementKey: stringValue(
-                    new URL(link.href, window.location.href).searchParams.get('StmtKey')
-                ),
-            };
-        })
-        .filter((item) => item.label || item.url);
 }
 
 function getStatementKey(item) {
