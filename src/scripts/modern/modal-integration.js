@@ -77,7 +77,7 @@ export function setupModernModalIntegration() {
                     table.removeAttribute('data-csui-payment-form');
                     table.querySelectorAll('[data-csui-payment-row]').forEach((row) => {
                         row.removeAttribute('data-csui-payment-row');
-                        row.removeAttribute('data-csui-payment-due');
+                        // Keep the original due snapshot across enhancement toggles.
                     });
                 });
             });
