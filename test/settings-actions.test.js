@@ -18,7 +18,10 @@ for (const [action, rawField, field, method] of [
 ]) {
     for (const initial of [false, true]) {
         test(`${action} preserves last known ${initial} until a reload verifies the setting`, async () => {
-            const dom = new JSDOM('', { url: 'https://example.com/', runScripts: 'outside-only' });
+            const dom = new JSDOM('', {
+                url: 'https://share.dwcorp.com/WebShare/Account.aspx?clientKey=3652&viewID=3',
+                runScripts: 'outside-only',
+            });
             const { window } = dom;
             const account = { PNALKey: 'A', PTntvfFmtPremTenant: 'A', [rawField]: initial };
             const other = { PNALKey: 'B', PTntvfFmtPremTenant: 'B', [rawField]: initial };

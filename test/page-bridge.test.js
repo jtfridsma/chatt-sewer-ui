@@ -4,6 +4,51 @@ import { build } from 'esbuild';
 import { JSDOM } from 'jsdom';
 import { MODERN_BRIDGE_EVENTS as EVENTS } from '../src/scripts/modern/bridge/events.js';
 
+test('bridge only installs for Chattanooga and selects accounts while active', async () => {
+    const { outputFiles } = await build({
+        entryPoints: ['src/scripts/modern/bridge/page-bridge.js'],
+        bundle: true,
+        write: false,
+        format: 'iife',
+    });
+    for (const query of ['clientKey=9999&viewID=3', '', 'clientKey=3652&viewID=3']) {
+        const dom = new JSDOM('', {
+            url: `https://share.dwcorp.com/WebShare/Account.aspx?${query}`,
+            runScripts: 'outside-only',
+        });
+        const { window } = dom;
+        const accounts = ['A', 'B'].map((PNALKey) => ({
+            PNALKey,
+            PTntvfFmtPremTenant: PNALKey,
+        }));
+        const scope = {
+            displayAccounts: accounts,
+            userSelections: [accounts[0]],
+            showWaterConsumptionGraph: false,
+        };
+        window.angular = { element: () => ({ scope: () => scope }) };
+        window.setTimeout = window.setInterval = () => 1;
+        const dispatch = (name, detail) =>
+            window.dispatchEvent(new window.CustomEvent(name, { detail }));
+        const select = (accountKey) => dispatch(EVENTS.selectAccount, { accountKey });
+        try {
+            window.eval(outputFiles[0].text);
+            const eligible = query === 'clientKey=3652&viewID=3';
+            assert.equal(Boolean(window.__CSUIModernDashboardBridge__), eligible);
+            select('B');
+            assert.equal(scope.userSelections[0], accounts[0]);
+            dispatch(EVENTS.start);
+            select('B');
+            assert.equal(scope.userSelections[0], accounts[eligible ? 1 : 0]);
+            dispatch(EVENTS.stop);
+            select(eligible ? 'A' : 'B');
+            assert.equal(scope.userSelections[0], accounts[eligible ? 1 : 0]);
+        } finally {
+            window.close();
+        }
+    }
+});
+
 test('withholds unowned Angular and DOM statements during delayed account switches', async () => {
     const { outputFiles } = await build({
         entryPoints: ['src/scripts/modern/bridge/page-bridge.js'],
@@ -12,7 +57,7 @@ test('withholds unowned Angular and DOM statements during delayed account switch
         format: 'iife',
     });
     const dom = new JSDOM('<a href="StatementView.aspx?StmtKey=101">August 1, 2026</a>', {
-        url: 'https://example.com/',
+        url: 'https://share.dwcorp.com/WebShare/Account.aspx?clientKey=3652&viewID=3',
         runScripts: 'outside-only',
     });
     const { window } = dom;

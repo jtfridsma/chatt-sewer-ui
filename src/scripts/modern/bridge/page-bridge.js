@@ -2,6 +2,7 @@
 // Do not add chrome.* access or privileged extension behavior here.
 
 import { MODERN_BRIDGE_EVENTS as EVENTS } from './events.js';
+import { getChattContext } from '../../utilities/context.js';
 import {
     excludeForeignMeterSeries,
     normalizeAccount,
@@ -20,7 +21,7 @@ const CHANGE_DEBOUNCE_MS = 50;
 const FALLBACK_DELAY_MS = 2000;
 const MAX_FALLBACK_ATTEMPTS = 3;
 
-if (!window[BRIDGE_KEY]) {
+if (getChattContext(window.location).isChattWebShare && !window[BRIDGE_KEY]) {
     window[BRIDGE_KEY] = installBridge();
 }
 
@@ -202,6 +203,7 @@ function installBridge() {
     }
 
     function selectAccount(event) {
+        if (!active) return;
         const detail = event?.detail || {};
         const accountNumber = String(detail.accountNumber || '');
         const accountKey = String(detail.accountKey || '');
