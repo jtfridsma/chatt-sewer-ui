@@ -61,3 +61,11 @@
     font-display: swap;
     src: url('./Gabarito-Bold.ttf') format('truetype');
 }
+/* Google Material Symbols Rounded: the 17 icons listed in MaterialSymbols-README.txt. */
+@font-face {
+    font-family: 'Material Symbols Rounded';
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url('./MaterialSymbolsRounded-subset.ttf') format('truetype');
+}

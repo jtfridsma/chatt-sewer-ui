@@ -90,34 +90,18 @@ function syncPageChrome(ctx, enabled) {
 }
 
 function ensureFontsLoaded() {
-    // Text fonts are bundled; icons still use Google Fonts.
+    // Text and icon fonts are bundled with the extension.
     // Host-page CSP may block font loads; text retains its fallback fonts.
-    // These resource hints/stylesheets intentionally remain loaded when the visual theme is off.
+    // The local stylesheet remains available for the toggle when the theme is off.
     if (typeof document === 'undefined') return;
 
     const head = document.head || document.getElementsByTagName('head')[0];
     if (!head) return;
 
     ensureHeadLink(head, {
-        id: 'csui-google-fonts-preconnect-1',
-        rel: 'preconnect',
-        href: 'https://fonts.googleapis.com',
-    });
-    ensureHeadLink(head, {
-        id: 'csui-google-fonts-preconnect-2',
-        rel: 'preconnect',
-        href: 'https://fonts.gstatic.com',
-        crossOrigin: 'anonymous',
-    });
-    ensureHeadLink(head, {
         id: 'csui-local-fonts',
         rel: 'stylesheet',
         href: getExtensionUrl('public/fonts/fonts.css'),
-    });
-    ensureHeadLink(head, {
-        id: 'csui-google-symbols',
-        rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded&icon_names=account_circle,autorenew,block,check_circle,close,description,edit_note,error,gas_meter,info,keyboard_arrow_down,lock,logout,menu,payments,receipt_long,warning&display=block',
     });
 }
 

@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { build } from 'esbuild';
 import { JSDOM } from 'jsdom';
 
-test('loads bundled text fonts once and keeps only icons on Google Fonts', async () => {
+test('loads bundled text and icon fonts once without external font connections', async () => {
     const { outputFiles } = await build({
         stdin: {
             contents: `export { applyThemeClasses } from './src/scripts/utilities/theme.js';`,
@@ -28,13 +28,13 @@ test('loads bundled text fonts once and keeps only icons on Google Fonts', async
         const links = [...window.document.querySelectorAll('link[rel="stylesheet"]')];
         assert.deepEqual(
             links.map((link) => link.id),
-            ['csui-local-fonts', 'csui-google-symbols']
+            ['csui-local-fonts']
         );
         assert.equal(links[0].href, 'chrome-extension://test/public/fonts/fonts.css');
-        assert.match(links[1].href, /family=Material\+Symbols\+Rounded/);
+        assert.equal(window.document.querySelector('link[rel="preconnect"]'), null);
         const css = await readFile('public/fonts/fonts.css', 'utf8');
         const paths = [...css.matchAll(/url\('\.\/([^']+)'\)/g)].map((match) => match[1]);
-        assert.equal(paths.length, 8);
+        assert.equal(paths.length, 9);
         for (const path of paths) {
             const font = await readFile(`public/fonts/${path}`);
             assert.equal(font.readUInt32BE(0), 0x00010000);
