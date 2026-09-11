@@ -107,10 +107,12 @@ Build toolchain:
 ### Updating the version
 
 1. Run `npm version patch --no-git-tag-version` (or `minor`, `major`, or an exact version).
-2. The npm `version` hook syncs `manifest.json` automatically. Update release references in `TEST_INSTRUCTIONS.md` and other documentation, or use the project's `prepare-release` skill.
-3. Review and commit `package.json`, `package-lock.json`, and `manifest.json` together.
+2. The npm `version` hook syncs `manifest.json` automatically. Update release references in `TEST_INSTRUCTIONS.md`, other documentation, and the version fallbacks in `src/scripts/components/theme-toggle.js`.
+3. Review and commit the three version files and updated references together.
 
 Use numeric versions without prerelease suffixes such as `-beta.1`. The flag prevents automatic Git commits and tags. Packaging does not bump versions or publish; rebuild the same release without bumping again.
+
+For agent-assisted preparation, ask: `Use $prepare-release to prepare a patch release.` The [project skill](.agents/skills/prepare-release/SKILL.md) handles the bump, reference updates, and package checks without committing or publishing. If the version hook fails, inspect the version files before retrying; npm may already have applied the bump.
 
 ### Creating the archive
 
