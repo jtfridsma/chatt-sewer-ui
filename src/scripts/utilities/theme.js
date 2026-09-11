@@ -5,6 +5,7 @@ import {
     applyPageChrome,
     applyWebShareChrome,
     captureOriginalPageChrome,
+    getExtensionUrl,
     restorePageChrome,
 } from './chrome.js';
 import { readThemeEnabled, setThemeEnabled, subscribeToThemeToggle } from './theme-state.js';
@@ -89,8 +90,8 @@ function syncPageChrome(ctx, enabled) {
 }
 
 function ensureFontsLoaded() {
-    // Best-effort: inject Google Fonts stylesheet once per page.
-    // Note: host-page CSP may block external font loads; in that case fallbacks will be used.
+    // Text fonts are bundled; icons still use Google Fonts.
+    // Host-page CSP may block font loads; text retains its fallback fonts.
     // These resource hints/stylesheets intentionally remain loaded when the visual theme is off.
     if (typeof document === 'undefined') return;
 
@@ -109,9 +110,9 @@ function ensureFontsLoaded() {
         crossOrigin: 'anonymous',
     });
     ensureHeadLink(head, {
-        id: 'csui-google-fonts',
+        id: 'csui-local-fonts',
         rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Gabarito:wght@400;500;600;700&display=swap',
+        href: getExtensionUrl('public/fonts/fonts.css'),
     });
     ensureHeadLink(head, {
         id: 'csui-google-symbols',
