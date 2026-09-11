@@ -37,6 +37,11 @@ function initializeModernDashboard() {
     const view = createDashboardView({
         host,
         actions: {
+            showOriginalDashboard() {
+                const toggle = document.getElementById('csui-enabled-toggle');
+                if (toggle?.checked) toggle.click();
+                document.getElementById('csui-launcher')?.focus();
+            },
             selectAccount(account) {
                 dataAdapter.selectAccount(account);
             },

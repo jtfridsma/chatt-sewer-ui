@@ -229,14 +229,12 @@ export const DASHBOARD_STYLES = `
 
         .dashboard-sidebar {
             position: sticky;
-            top: 1rem;
+            top: calc(var(--dashboard-header-height, 0px) + 1rem);
+            /* Leave the 1rem header gap and the shell's 2rem bottom padding. */
+            min-height: calc(100dvh - var(--dashboard-header-height, 0px) - 3rem);
             display: flex;
             flex-direction: column;
             gap: 0.8rem;
-            height: var(--dashboard-sidebar-height, calc(100dvh - 2rem));
-            overflow-y: auto;
-            overscroll-behavior: contain;
-            padding-right: 0.15rem;
         }
 
         .account-sidebar {
@@ -259,6 +257,19 @@ export const DASHBOARD_STYLES = `
 
         .dashboard-helper a {
             font-weight: 600;
+        }
+
+        .dashboard-helper__switch {
+            border: 0;
+            padding: 0;
+            background: none;
+            color: var(--dashboard-accent);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .dashboard-helper__switch:hover {
+            text-decoration: underline;
         }
 
         .account-sidebar__header {
@@ -612,6 +623,7 @@ export const DASHBOARD_STYLES = `
         .ghost-action:focus-visible,
         .menu-button:focus-visible,
         .text-action:focus-visible,
+        .dashboard-helper__switch:focus-visible,
         .detail-tab:focus-visible,
         .meter-tab:focus-visible,
         .account-nav-item:focus-visible,
@@ -1235,9 +1247,6 @@ export const DASHBOARD_STYLES = `
             .dashboard-sidebar {
                 position: static;
                 display: contents;
-                height: auto;
-                overflow: visible;
-                padding: 0;
             }
 
             .account-sidebar {

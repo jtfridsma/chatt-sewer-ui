@@ -98,7 +98,8 @@ export function renderDashboardHelper() {
     return `
         <aside class="dashboard-helper" aria-label="Dashboard help and service contacts">
             <p>
-                Trouble with this enhanced dashboard? Try disabling the plugin, or
+                Having trouble?
+                <button type="button" class="dashboard-helper__switch" data-action="original-dashboard">Switch to the original dashboard</button> or
                 <a href="https://github.com/jtfridsma/chatt-sewer-ui/issues/new" target="_blank" rel="noopener noreferrer">report an issue</a>.
             </p>
             <p>

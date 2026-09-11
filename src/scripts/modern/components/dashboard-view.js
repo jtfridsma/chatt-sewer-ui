@@ -26,7 +26,9 @@ export function createDashboardView({ host, actions }) {
     let selectedDetailTab = 'summary';
     let chartInstances = [];
     let detachActionMenuEvents = () => {};
-    let sidebarLayoutFrame = null;
+    const headerObserver = window.ResizeObserver
+        ? new window.ResizeObserver(syncHeaderHeight)
+        : null;
     let renderGeneration = 0;
 
     const style = document.createElement('style');
@@ -37,29 +39,15 @@ export function createDashboardView({ host, actions }) {
     content.addEventListener('change', handleContentChange);
     content.addEventListener('keydown', handleContentKeydown);
 
-    const scheduleSidebarLayout = () => {
-        if (sidebarLayoutFrame !== null) return;
-        sidebarLayoutFrame = window.requestAnimationFrame(() => {
-            sidebarLayoutFrame = null;
-            syncSidebarHeight();
-        });
-    };
-
-    const syncSidebarHeight = () => {
-        const sidebar = shadow.querySelector('.dashboard-sidebar');
-        if (!sidebar || window.innerWidth <= 900) return;
-
-        const viewportInset = 16;
-        const top = Math.max(viewportInset, sidebar.getBoundingClientRect().top);
-        const height = Math.max(0, window.innerHeight - top - viewportInset);
-        const nextHeight = `${height}px`;
-        if (sidebar.style.getPropertyValue('--dashboard-sidebar-height') !== nextHeight) {
-            sidebar.style.setProperty('--dashboard-sidebar-height', nextHeight);
+    function syncHeaderHeight() {
+        const header = shadow.querySelector('.modern-header');
+        if (header) {
+            host.style.setProperty(
+                '--dashboard-header-height',
+                `${header.getBoundingClientRect().height}px`
+            );
         }
-    };
-
-    window.addEventListener('scroll', scheduleSidebarLayout, { passive: true });
-    window.addEventListener('resize', scheduleSidebarLayout);
+    }
 
     function renderLoading() {
         renderGeneration += 1;
@@ -123,20 +111,22 @@ export function createDashboardView({ host, actions }) {
                 chartInstances = charts;
             })
             .catch(logConsumptionChartFailure);
-        scheduleSidebarLayout();
+        headerObserver?.disconnect();
+        syncHeaderHeight();
+        const header = shadow.querySelector('.modern-header');
+        if (header) headerObserver?.observe(header);
     }
 
     function destroy() {
         renderGeneration += 1;
         detachActionMenuEvents();
         detachActionMenuEvents = () => {};
-        window.removeEventListener('scroll', scheduleSidebarLayout);
-        window.removeEventListener('resize', scheduleSidebarLayout);
+        headerObserver?.disconnect();
+        host.style.removeProperty('--dashboard-header-height');
         content.removeEventListener('click', handleContentClick);
         content.removeEventListener('change', handleContentChange);
         content.removeEventListener('keydown', handleContentKeydown);
-        if (sidebarLayoutFrame !== null) window.cancelAnimationFrame(sidebarLayoutFrame);
-        sidebarLayoutFrame = null;
+
         destroyCharts();
         content.replaceChildren();
         currentState = null;
@@ -180,6 +170,7 @@ export function createDashboardView({ host, actions }) {
             if (action === 'profile') actions?.openProfile?.();
             if (action === 'password') actions?.openChangePassword?.();
             if (action === 'sign-out') actions?.signOut?.();
+            if (action === 'original-dashboard') actions?.showOriginalDashboard?.();
             closeActionMenus();
             event.preventDefault();
             return;
