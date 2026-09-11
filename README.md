@@ -112,3 +112,8 @@ files into a clean staging directory, and writes `dist/chatt-sewer-ui-v<VERSION>
 
 The ZIP contains `manifest.json` at its root and can be submitted or shared without the source tree,
 development dependencies, or stale unreferenced build output.
+
+Maintain [reviewer test instructions](TEST_INSTRUCTIONS.md) alongside each release. Before submission,
+update the access arrangement and copy the reviewer section into the Chrome Web Store Test
+instructions field. Keep credentials out of the repository. The instructions document is not included
+in the runtime ZIP; authenticated reviewer access must be arranged separately.
