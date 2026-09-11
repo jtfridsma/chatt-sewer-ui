@@ -174,9 +174,11 @@ export const DASHBOARD_STYLES = `
             color: var(--dashboard-heading);
         }
 
-        h2 {
+        h2,
+        .chart__readings summary {
             font-size: 1rem;
             line-height: 1.25;
+            font-weight: 700;
             color: var(--dashboard-heading);
         }
 
@@ -614,6 +616,7 @@ export const DASHBOARD_STYLES = `
         .meter-tab:focus-visible,
         .account-nav-item:focus-visible,
         .action-menu summary:focus-visible,
+        .chart__readings summary:focus-visible,
         .setting-toggle input:focus-visible + .switch-ui {
             outline: 3px solid #f3b233;
             outline-offset: 2px;
@@ -684,7 +687,8 @@ export const DASHBOARD_STYLES = `
             list-style: none;
         }
 
-        .action-menu summary::-webkit-details-marker {
+        .action-menu summary::-webkit-details-marker,
+        .chart__readings summary::-webkit-details-marker {
             display: none;
         }
 
@@ -693,7 +697,8 @@ export const DASHBOARD_STYLES = `
             transition: transform 150ms ease;
         }
 
-        .action-menu--account[open] .action-menu__icon {
+        .action-menu--account[open] .action-menu__icon,
+        .chart__readings[open] .action-menu__icon {
             transform: rotate(180deg);
         }
 
@@ -838,14 +843,17 @@ export const DASHBOARD_STYLES = `
             border-bottom: 0;
         }
 
-        .summary-field dt {
+        .summary-field dt,
+        .chart__readings thead th {
             max-width: 300px;
             color: var(--dashboard-text-muted);
             font-size: 0.74rem;
             font-weight: 400;
         }
 
-        .summary-field dd {
+        .summary-field dd,
+        .chart__readings tbody th,
+        .chart__readings td {
             margin: 0;
             color: var(--dashboard-text);
             font-size: 0.98rem;
@@ -1078,6 +1086,55 @@ export const DASHBOARD_STYLES = `
             display: block;
             width: 100% !important;
             height: 100% !important;
+        }
+
+        .chart__readings {
+            border: 1px solid var(--dashboard-border);
+            border-radius: var(--card-radius);
+            padding: 1rem;
+            background: var(--dashboard-surface);
+        }
+
+        .chart__readings summary {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            list-style: none;
+            cursor: pointer;
+        }
+
+        .chart__readings table {
+            width: 100%;
+            margin-top: 0.65rem;
+            border-collapse: collapse;
+        }
+
+        .chart__readings th,
+        .chart__readings td {
+            padding: 0.65rem 0;
+            border-bottom: 1px solid var(--dashboard-row-border);
+            text-align: left;
+        }
+
+        .chart__readings caption {
+            max-width: none;
+            padding: 0.65rem 0;
+            text-align: left;
+        }
+
+        .chart__readings tr > :first-child {
+            padding-right: 1rem;
+        }
+
+        .chart__readings tbody tr:last-child > * {
+            padding-bottom: 0;
+            border-bottom: 0;
+        }
+
+        .chart__readings thead th:last-child,
+        .chart__readings td {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
         }
 
         figcaption:not(.chart__summary) {

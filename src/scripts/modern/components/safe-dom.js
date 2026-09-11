@@ -4,6 +4,7 @@ const ALLOWED_ELEMENTS = new Set([
     'aside',
     'button',
     'canvas',
+    'caption',
     'details',
     'div',
     'dl',
@@ -26,6 +27,12 @@ const ALLOWED_ELEMENTS = new Set([
     'span',
     'strong',
     'summary',
+    'table',
+    'tbody',
+    'td',
+    'th',
+    'thead',
+    'tr',
     'ul',
 ]);
 
@@ -38,6 +45,7 @@ const ALLOWED_ATTRIBUTES = new Set([
     'id',
     'rel',
     'role',
+    'scope',
     'src',
     'target',
     'title',

@@ -746,6 +746,19 @@ function renderBarChart(readings, meterNumber) {
                     aria-label="Water consumption for ${escapeAttr(meterNumber || 'meter')}"
                 ></canvas>
             </div>
+            <details class="chart__readings">
+                <summary>${renderIcon('keyboard_arrow_down', 'action-menu__icon')}<span>View Readings Table</span></summary>
+                <table>
+                    <caption class="empty-inline">Water consumption for ${escapeHtml(cleanMeterNumber(meterNumber) || 'meter')}</caption>
+                    <thead><tr><th scope="col">Read Date</th><th scope="col">Consumption</th></tr></thead>
+                    <tbody>${chartData
+                        .map(
+                            (reading) =>
+                                `<tr><th scope="row">${escapeHtml(reading.label)}</th><td>${escapeHtml(reading.consumption.toLocaleString('en-US'))}</td></tr>`
+                        )
+                        .join('')}</tbody>
+                </table>
+            </details>
         </figure>
     `;
 }
