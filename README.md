@@ -6,10 +6,23 @@ A focused Chrome extension that transforms Chattanooga's legacy sewer payment po
 
 - Injects a compiled stylesheet and bundled content script on:
     - `https://www.sewerpayments.com/chattanooga*`
-    - `https://share.dwcorp.com/WebShare/*` (scoped to the Chattanooga tenant via query params)
+    - `https://share.dwcorp.com/WebShare/*` and `https://share.dwcorp.com/webshare/*` (scoped to Chattanooga by `clientKey=3652`; `viewID=3` is not required)
 - Uses scoped CSS (`html.csui-theme`) to avoid leaking styles outside the target pages.
 - Keeps source in `src/` and compiled assets in `public/`.
 - Adds an accessible in-page toggle (top-right) labeled “Chatt Sewer UI”.
+- Retrieves statements through account-scoped portal requests and opens them in a new tab.
+- Provides an expandable readings table beneath each water-consumption chart.
+- Bundles Inter, Gabarito, and a Material Symbols Rounded icon subset; font and icon loading makes no external font-service requests.
+
+### Dashboard status messages
+
+After a paperless-billing or automatic-payment change, “Not confirmed” means the extension cannot
+verify that the portal saved the change. Complete any portal steps, then reload the page to check.
+The setting retains its previous displayed value and cannot be changed again while unconfirmed.
+An immediate failure displays “Could not change this setting. Please try again.”
+
+Missing or invalid balances display “Unavailable” rather than zero. Check the original dashboard
+before making a payment when the extension cannot read your balance.
 
 ## Quick start (Chrome / Chromium)
 
@@ -29,13 +42,14 @@ Notes:
 - Styles compile from `src/styles/main.scss` to `public/main.css` (Sass).
 - JS bundles from `src/scripts/main.js` to `public/main.js` (esbuild).
 - Compiled files in `public/` are generated locally and are not committed.
+- Bundled fonts and their licenses are committed in `public/fonts/`: Inter and Gabarito use the SIL Open Font License; Material Symbols uses Apache License 2.0. See `public/fonts/MaterialSymbols-README.txt` before adding icons to the subset.
 - While `npm run dev` is running, reload the target page to see updates (Chrome may require reloading the extension after JS changes).
 
 ## Project rules
 
 - Keep it plain JavaScript. No framework, no TypeScript, no runtime abstraction layer.
 - Prefer scoped CSS under `html.csui-theme` plus page-specific classes.
-- Visual and structural content-script changes should be idempotent and reversible when the enhancement toggle is turned off. Injected font resources may remain loaded.
+- Visual and structural content-script changes should be idempotent and reversible when the enhancement toggle is turned off. Bundled font resources may remain loaded for the in-page control. The original payment-due snapshot intentionally remains on the modal row across toggles so an edited payment amount does not replace it.
 - Favor a few explicit modules over “reusable” infrastructure.
 
 ### Squarespace block contracts
@@ -63,7 +77,9 @@ when the inactive label was inferred.
 │  ├─ main.js
 │  ├─ csui-modern-bridge.js
 │  ├─ csui-consumption-chart.js
-│  └─ icons/
+│  ├─ icons/
+│  ├─ favicons/
+│  └─ fonts/             # Bundled text/icon fonts, stylesheet, and licenses
 └─ src/
    ├─ styles/            # Sass source (tokens, base, components, templates)
    └─ scripts/           # JS source (context detection, class application, toggle)
@@ -79,7 +95,7 @@ when the inactive label was inferred.
 - `npm run dev:css` — watch Sass
 - `npm run dev:js` — watch JS (esbuild)
 - `npm run lint` — Prettier check
-- `npm test` — runs focused unit and lifecycle tests with Node's test runner
+- `npm test` — runs focused unit, integration, and lifecycle tests with Node's test runner, including bridge, settings, modal, balance, readings-table, and bundled-font checks
 - `npm run format` — Prettier write
 
 Build toolchain:
