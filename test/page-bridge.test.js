@@ -11,7 +11,13 @@ test('bridge only installs for Chattanooga and selects accounts while active', a
         write: false,
         format: 'iife',
     });
-    for (const query of ['clientKey=9999&viewID=3', '', 'clientKey=3652&viewID=3']) {
+    for (const query of [
+        'clientKey=9999&viewID=3',
+        '',
+        'clientKey=3652&viewID=3',
+        'clientKey=3652&viewID=7',
+        'clientKey=3652',
+    ]) {
         const dom = new JSDOM('', {
             url: `https://share.dwcorp.com/WebShare/Account.aspx?${query}`,
             runScripts: 'outside-only',
@@ -33,7 +39,7 @@ test('bridge only installs for Chattanooga and selects accounts while active', a
         const select = (accountKey) => dispatch(EVENTS.selectAccount, { accountKey });
         try {
             window.eval(outputFiles[0].text);
-            const eligible = query === 'clientKey=3652&viewID=3';
+            const eligible = query.startsWith('clientKey=3652');
             assert.equal(Boolean(window.__CSUIModernDashboardBridge__), eligible);
             select('B');
             assert.equal(scope.userSelections[0], accounts[0]);

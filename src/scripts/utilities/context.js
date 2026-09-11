@@ -10,7 +10,8 @@ export function getChattContext(locationLike) {
         url.hostname === 'share.dwcorp.com' && url.pathname.toLowerCase().startsWith('/webshare');
 
     const params = url.searchParams;
-    const isChattClient = params.get('clientKey') === '3652' && params.get('viewID') === '3';
+    // viewID=3 is the preferred view, but only clientKey identifies Chattanooga.
+    const isChattClient = params.get('clientKey') === '3652';
     const isChattWebShare = isDwcorpWebShare && isChattClient;
 
     const path = url.pathname.toLowerCase();
