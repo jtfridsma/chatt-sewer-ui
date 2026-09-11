@@ -78,6 +78,12 @@ function collectManifestResourcePatterns(manifest) {
     addIcons(manifest.action?.default_icon);
     add(manifest.action?.default_popup);
     add(manifest.options_ui?.page);
+    // The demo page links local JS, CSS, and a sample statement. These are private
+    // extension-page assets, not web-accessible resources for the live portal.
+    if (manifest.options_ui?.page === 'public/demo/index.html') {
+        add('public/demo/*');
+        add('public/demo.js');
+    }
     add(manifest.options_page);
     add(manifest.side_panel?.default_path);
     add(manifest.devtools_page);

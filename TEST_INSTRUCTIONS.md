@@ -20,8 +20,8 @@ instructions in a ZIP is not a substitute for completing the dashboard field.
   information, account identifiers, statement URLs, and payment details.
 - Refresh the public steps, expected results, and source map whenever functionality changes.
 
-Creating these instructions does not establish authenticated access. No provider test account,
-sanctioned sandbox, or interactive demo has been verified as available for this submission.
+Creating these instructions does not establish authenticated access. No provider test account or
+sanctioned sandbox has been arranged. A bundled synthetic demo is available through Extension options.
 
 ## Reviewer section — copy into the submission
 
@@ -31,7 +31,8 @@ Chattanooga Sewer UI Enhancer is an independent desktop Chrome extension. It imp
 on the Chattanooga landing page at https://www.sewerpayments.com/chattanooga and the Chattanooga
 tenant of https://share.dwcorp.com/WebShare/ (also matching lowercase /webshare/).
 The WebShare URL must contain clientKey=3652. viewID=3 is customary but is not required by the
-extension. The extension has no toolbar popup; its control appears inside supported pages.
+extension. The extension has no toolbar popup; its live control appears inside supported pages.
+Its Extension options page opens the synthetic dashboard demo described below.
 
 The underlying portal owns authentication, account records, payment processing, and account-change
 workflows. The extension is not affiliated with the City or the portal provider.
@@ -43,10 +44,34 @@ below. A new portal login alone may not provide a linked sewer account, statemen
 meter readings. Account registration and linking requirements are controlled by the portal and
 have not been verified here. Reviewers should not need a local address or invent account details.
 
-Without an authorized account containing suitable data, the populated dashboard, account switching,
-statement retrieval, consumption history, and authenticated modals cannot be fully exercised. No
-interactive demo or demonstration recording is currently supplied. These are access limitations,
-not evidence that the authenticated features have passed review.
+The bundled demo provides synthetic accounts and consumption history for interactive dashboard UI
+review without credentials or a local address. Live statement retrieval, authentication, Angular
+integration, and authenticated modals still require an authorized portal account. No demonstration
+recording is currently supplied. The demo does not establish that live integration has passed review.
+
+### Synthetic dashboard — no login or local account needed
+
+1. Open chrome://extensions, find Chattanooga Sewer UI Enhancer, choose Details, then Extension
+   options. The clearly labelled synthetic demo opens in its own tab. If Extension options is
+   missing after a development update, reload the installed extension first.
+2. Explore the three invented accounts. Two have distinct synthetic meters and readings; the
+   inactive account has empty statements, messages, and consumption history.
+3. Switch account-detail tabs and meter tabs. Expand View Readings Table and compare the chart.
+   Statement links open the same clearly labelled local sample document in a new tab.
+4. Use Dashboard state to view populated accounts, an unavailable balance, no accounts, and loading.
+   These are deliberate scenarios, not requests waiting for a real service.
+5. In the populated dashboard, open Preferences and change a setting. The Preference action result
+   control chooses Not confirmed or Error. These reproduce display states without saving anything.
+   Reset demo clears simulated changes and restores the initial account and tabs.
+6. Open Pay Now, Update Profile, Change Password, or Sign Out. Each opens a native dialog explaining
+   the simulation; close it with its button or Escape. These dialogs are not replicas of portal forms.
+7. Reload or reset the demo to start again. No credentials, payment information, or real addresses
+   are requested. Fixtures are hardcoded and changes remain in memory. Network connections are
+   blocked by the demo page policy; support links may navigate to external services when followed.
+
+The demo uses the same createDashboardView renderer and bundled Chart.js module as the live UI.
+It bypasses the MAIN-world bridge and all real portal actions. Source: src/scripts/demo.js; packaged
+entry: public/demo/index.html. It is included in the submitted product and available to all users.
 
 ### Public pages — no sewer account required for viewing
 
@@ -121,12 +146,10 @@ Execute write tests only in a provider-approved test environment explicitly desi
    and account owner permit it and the account can be shared safely. Read-only access, if supported,
    may cover viewing but will not verify write workflows. Do not assume a personal account with saved
    payment methods is an appropriate reviewer account.
-3. **Fallback to consider: a clearly labelled synthetic demo.** A bundled demo using the same dashboard
-   renderer could demonstrate layout, tabs, charts, and representative states without customer data.
-   It does not exist today and would require implementation. Keep it transparent and available in
-   the submitted product, not hidden reviewer-specific behavior. A standalone web mockup will not
-   exercise the extension's currently scoped content scripts. A demo cannot prove real login,
-   Angular integration, portal requests, or payment outcomes.
+3. **Available fallback: the bundled synthetic demo.** Use the reviewer steps above to demonstrate
+   layout, tabs, charts, and representative states without customer data. It is transparent and
+   available to all users in the submitted product. It cannot prove real login, Angular integration,
+   portal requests, the host's modal behavior, or payment outcomes.
 4. **Supplement: a redacted walkthrough recording.** Show the exact submitted version, populated
    dashboard, tab changes, and modal opening/cancellation. Explain unavailable scenarios. A recording
    helps communicate functionality but is not guaranteed to replace interactive access.

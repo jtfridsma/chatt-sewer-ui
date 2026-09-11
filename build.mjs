@@ -7,6 +7,7 @@ const sharedConfig = {
     entryPoints: {
         main: 'src/scripts/main.js',
         'csui-modern-bridge': 'src/scripts/modern/bridge/page-bridge.js',
+        demo: 'src/scripts/demo.js',
     },
     bundle: true,
     outdir: 'public',

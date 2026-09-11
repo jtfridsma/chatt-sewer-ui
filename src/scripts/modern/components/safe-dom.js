@@ -93,7 +93,14 @@ function sanitizeUrlAttribute(element, name, allowedProtocols) {
 
     try {
         const url = new URL(element.getAttribute(name), document.baseURI);
-        if (!allowedProtocols.has(url.protocol)) element.removeAttribute(name);
+        const page = new URL(document.baseURI);
+        const isOwnExtensionLink =
+            name === 'href' &&
+            page.protocol === 'chrome-extension:' &&
+            url.protocol === page.protocol &&
+            url.host === page.host;
+        if (!allowedProtocols.has(url.protocol) && !isOwnExtensionLink)
+            element.removeAttribute(name);
     } catch {
         element.removeAttribute(name);
     }

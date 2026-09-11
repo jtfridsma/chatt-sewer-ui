@@ -24,6 +24,27 @@ An immediate failure displays “Could not change this setting. Please try again
 Missing or invalid balances display “Unavailable” rather than zero. Check the original dashboard
 before making a payment when the extension cannot read your balance.
 
+### Synthetic dashboard demo
+
+No sewer account is needed to explore the bundled demo. After installing or reloading the extension,
+open `chrome://extensions`, select **Chattanooga Sewer UI Enhancer → Details → Extension options**.
+The demo opens in a tab and is available to everyone, not just reviewers.
+
+It reuses the production dashboard renderer with invented accounts, balances, statements, and meter
+readings. Try account and meter tabs, the readings table, the sample statement, and the state controls
+for loading, no accounts, and unavailable balances. Preference actions simulate “Not confirmed” or
+an error; **Reset demo** restores the initial state. Changes remain only in page memory.
+
+Payment, profile, password, and sign-out controls open labelled simulations, not real portal forms.
+The demo makes no portal requests and cannot authenticate, process payments, or change real accounts.
+Its page policy blocks network connections. User-followed support links can still open external sites.
+It demonstrates the dashboard UI, not live Angular integration, statement retrieval, or transaction
+outcomes. The sample statement is a local HTML document, not a real bill or PDF.
+
+Maintain the synthetic fixtures in `src/scripts/demo.js` and the page assets in `public/demo/`.
+The build generates `public/demo.js`; packaging includes the demo assets as private extension
+pages without adding host or API permissions.
+
 ## Quick start (Chrome / Chromium)
 
 1. Install dependencies: `npm install`

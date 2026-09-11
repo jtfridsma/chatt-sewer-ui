@@ -30,6 +30,14 @@ test('renders dashboard markup without retaining executable content', () => {
         assert.equal(root.querySelector('img').hasAttribute('onerror'), false);
         assert.equal(root.querySelector('#safe').getAttribute('href'), '/statement.pdf');
         assert.equal(root.querySelector('#safe').getAttribute('rel'), 'noopener noreferrer');
+        dom.reconfigure({ url: 'chrome-extension://demo/public/demo/index.html' });
+        replaceChildrenFromSanitizedMarkup(
+            root,
+            '<a id="local" href="statement.html">Sample</a><a id="foreign" href="chrome-extension://other/page.html">Other</a><a id="script" href="javascript:alert(1)">Script</a>'
+        );
+        assert.equal(root.querySelector('#local').getAttribute('href'), 'statement.html');
+        assert.equal(root.querySelector('#foreign').hasAttribute('href'), false);
+        assert.equal(root.querySelector('#script').hasAttribute('href'), false);
     } finally {
         if (previousDocument === undefined) delete globalThis.document;
         else globalThis.document = previousDocument;

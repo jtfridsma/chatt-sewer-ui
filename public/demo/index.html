@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="script-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'self'; img-src 'self'; font-src 'self'"
+        />
+        <title>Synthetic dashboard demo — Chatt Sewer UI</title>
+        <link rel="stylesheet" href="../fonts/fonts.css" />
+        <link rel="stylesheet" href="demo.css" />
+        <script src="../demo.js" defer></script>
+    </head>
+    <body>
+        <header class="demo-banner">
+            <h1>Chatt Sewer UI · Synthetic demo</h1>
+            <p>
+                All accounts, addresses, balances, and readings below are invented. This uses the
+                real dashboard renderer, with no login, portal connection, or saved changes. Action
+                dialogs are simulations, not the portal’s payment or account forms.
+            </p>
+            <div class="demo-controls">
+                <label>
+                    Dashboard state
+                    <select id="scenario">
+                        <option value="populated">Populated accounts</option>
+                        <option value="unavailable">Unavailable balance</option>
+                        <option value="empty">No accounts</option>
+                        <option value="loading">Loading</option>
+                    </select>
+                </label>
+                <label>
+                    Preference action result
+                    <select id="preference-result">
+                        <option value="unconfirmed">Not confirmed</option>
+                        <option value="error">Error</option>
+                    </select>
+                </label>
+                <button id="reset" type="button">Reset demo</button>
+            </div>
+            <p id="demo-status" role="status">Choose an account or explore the dashboard tabs.</p>
+        </header>
+        <div id="demo-dashboard"></div>
+        <dialog id="demo-dialog" aria-labelledby="demo-dialog-title">
+            <h2 id="demo-dialog-title"></h2>
+            <p id="demo-dialog-description"></p>
+            <button id="close-dialog" type="button" autofocus>Close simulation</button>
+        </dialog>
+    </body>
+</html>

@@ -1,0 +1,58 @@
+body {
+    margin: 0;
+    background: #eef3f6;
+    color: #172033;
+    font-family: Inter, system-ui, sans-serif;
+    line-height: 1.5;
+}
+.demo-banner {
+    padding: 1.25rem max(1rem, calc((100vw - 1280px) / 2));
+    border-bottom: 4px solid #f3b233;
+    background: #092f49;
+    color: white;
+}
+h1 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+.demo-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 1rem;
+}
+label {
+    display: grid;
+    gap: 0.25rem;
+}
+button,
+select {
+    padding: 0.6rem;
+    border: 1px solid #9fb0bd;
+    border-radius: 6px;
+    background: white;
+    color: #172033;
+    font: inherit;
+}
+button {
+    cursor: pointer;
+}
+:focus-visible {
+    outline: 3px solid #f3b233;
+    outline-offset: 3px;
+}
+dialog,
+.sample-statement {
+    max-width: 38rem;
+    padding: 1.5rem;
+    border: 1px solid #9fb0bd;
+    border-radius: 8px;
+    color: #172033;
+    background: white;
+}
+dialog::backdrop {
+    background: rgb(9 47 73 / 65%);
+}
+.sample-statement {
+    margin: 2rem auto;
+}

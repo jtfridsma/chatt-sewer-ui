@@ -16,6 +16,7 @@ public/main.js
 public/main.css
 public/csui-modern-bridge.js
 public/csui-consumption-chart.js
+public/demo.js
 public/*.map
 
 # Packaged extension output
