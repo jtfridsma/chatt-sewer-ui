@@ -11,6 +11,7 @@
   "author": "jtf",
   "license": "UNLICENSED",
   "scripts": {
+    "version": "node scripts/sync-manifest-version.mjs",
     "build:css": "sass src/styles/main.scss public/main.css --no-source-map --style=compressed",
     "build:js": "node build.mjs",
     "build": "npm-run-all build:*",

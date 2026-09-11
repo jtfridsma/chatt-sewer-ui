@@ -16,34 +16,19 @@ A focused Chrome extension that transforms Chattanooga's legacy sewer payment po
 
 ### Dashboard status messages
 
-After a paperless-billing or automatic-payment change, “Not confirmed” means the extension cannot
-verify that the portal saved the change. Complete any portal steps, then reload the page to check.
-The setting retains its previous displayed value and cannot be changed again while unconfirmed.
-An immediate failure displays “Could not change this setting. Please try again.”
+After a paperless-billing or automatic-payment change, “Not confirmed” means the extension cannot verify that the portal saved the change. Complete any portal steps, then reload the page to check. The setting retains its previous displayed value and cannot be changed again while unconfirmed. An immediate failure displays “Could not change this setting. Please try again.”
 
-Missing or invalid balances display “Unavailable” rather than zero. Check the original dashboard
-before making a payment when the extension cannot read your balance.
+Missing or invalid balances display “Unavailable” rather than zero. Check the original dashboard before making a payment when the extension cannot read your balance.
 
 ### Synthetic dashboard demo
 
-No sewer account is needed to explore the bundled demo. After installing or reloading the extension,
-open `chrome://extensions`, select **Chattanooga Sewer UI Enhancer → Details → Extension options**.
-The demo opens in a tab and is available to everyone, not just reviewers.
+No sewer account is needed to explore the bundled demo. After installing or reloading the extension, open `chrome://extensions`, select **Chattanooga Sewer UI Enhancer → Details → Extension options**. The demo opens in a tab and is available to everyone, not just reviewers.
 
-It reuses the production dashboard renderer with invented accounts, balances, statements, and meter
-readings. Try account and meter tabs, the readings table, the sample statement, and the state controls
-for loading, no accounts, and unavailable balances. Preference actions simulate “Not confirmed” or
-an error; **Reset demo** restores the initial state. Changes remain only in page memory.
+It reuses the production dashboard renderer with invented accounts, balances, statements, and meter readings. Try account and meter tabs, the readings table, the sample statement, and the state controls for loading, no accounts, and unavailable balances. Preference actions simulate “Not confirmed” or an error; **Reset demo** restores the initial state. Changes remain only in page memory.
 
-Payment, profile, password, and sign-out controls open labelled simulations, not real portal forms.
-The demo makes no portal requests and cannot authenticate, process payments, or change real accounts.
-Its page policy blocks network connections. User-followed support links can still open external sites.
-It demonstrates the dashboard UI, not live Angular integration, statement retrieval, or transaction
-outcomes. The sample statement is a local HTML document, not a real bill or PDF.
+Payment, profile, password, and sign-out controls open labelled simulations, not real portal forms. The demo makes no portal requests and cannot authenticate, process payments, or change real accounts. Its page policy blocks network connections. User-followed support links can still open external sites. It demonstrates the dashboard UI, not live Angular integration, statement retrieval, or transaction outcomes. The sample statement is a local HTML document, not a real bill or PDF.
 
-Maintain the synthetic fixtures in `src/scripts/demo.js` and the page assets in `public/demo/`.
-The build generates `public/demo.js`; packaging includes the demo assets as private extension
-pages without adding host or API permissions.
+Maintain the synthetic fixtures in `src/scripts/demo.js` and the page assets in `public/demo/`. The build generates `public/demo.js`; packaging includes the demo assets as private extension pages without adding host or API permissions.
 
 ## Quick start (Chrome / Chromium)
 
@@ -75,18 +60,11 @@ Notes:
 
 ### Squarespace block contracts
 
-The landing-page enhancements intentionally depend on specific Squarespace block IDs. They are
-required integration contracts, shared by the landing-page JavaScript and Sass, because a semantic
-fallback could modify the wrong content. If Squarespace regenerates them, the extension reports the
-missing blocks through its existing error indicator and leaves the affected host content unchanged.
+The landing-page enhancements intentionally depend on specific Squarespace block IDs. They are required integration contracts, shared by the landing-page JavaScript and Sass, because a semantic fallback could modify the wrong content. If Squarespace regenerates them, the extension reports the missing blocks through its existing error indicator and leaves the affected host content unchanged.
 
 ### Inactive account behavior
 
-The modern dashboard intentionally treats a zero-due account with no payment activity for roughly
-18 months as inactive, even when the portal does not explicitly mark it inactive. On initial load,
-the dashboard may select a more active account instead. This opinionated behavior is intended to
-foreground the account most likely to need payment activity; the account-status tooltip discloses
-when the inactive label was inferred.
+The modern dashboard intentionally treats a zero-due account with no payment activity for roughly 18 months as inactive, even when the portal does not explicitly mark it inactive. On initial load, the dashboard may select a more active account instead. This opinionated behavior is intended to foreground the account most likely to need payment activity; the account-status tooltip discloses when the inactive label was inferred.
 
 ## Project structure
 
@@ -124,17 +102,20 @@ Build toolchain:
 - esbuild (`build.mjs`) bundles the main content script, MAIN-world bridge, and lazy Chart.js module
 - Sass compiles `src/styles/main.scss`
 
-## Beta packaging
+## Packaging
 
-Run `npm run package` to create a distributable extension archive. The command runs formatting and
-tests through the production build, clears `dist/`, verifies that `manifest.json` and `package.json`
-versions match, validates every manifest resource, copies only the manifest and referenced runtime
-files into a clean staging directory, and writes `dist/chatt-sewer-ui-v<VERSION>.zip`.
+### Updating the version
 
-The ZIP contains `manifest.json` at its root and can be submitted or shared without the source tree,
-development dependencies, or stale unreferenced build output.
+1. Run `npm version patch --no-git-tag-version` (or `minor`, `major`, or an exact version).
+2. The npm `version` hook syncs `manifest.json` automatically. Update release references in `TEST_INSTRUCTIONS.md` and other documentation, or use the project's `prepare-release` skill.
+3. Review and commit `package.json`, `package-lock.json`, and `manifest.json` together.
 
-Maintain [reviewer test instructions](TEST_INSTRUCTIONS.md) alongside each release. Before submission,
-update the access arrangement and copy the reviewer section into the Chrome Web Store Test
-instructions field. Keep credentials out of the repository. The instructions document is not included
-in the runtime ZIP; authenticated reviewer access must be arranged separately.
+Use numeric versions without prerelease suffixes such as `-beta.1`. The flag prevents automatic Git commits and tags. Packaging does not bump versions or publish; rebuild the same release without bumping again.
+
+### Creating the archive
+
+Run `npm run package` to create a distributable extension archive. The command runs formatting and tests through the production build, clears `dist/`, verifies that `manifest.json` and `package.json` versions match, validates every manifest resource, copies only the manifest and referenced runtime files into a clean staging directory, and writes `dist/chatt-sewer-ui-v<VERSION>.zip`.
+
+The ZIP contains `manifest.json` at its root and can be submitted or shared without the source tree, development dependencies, or stale unreferenced build output.
+
+Maintain [reviewer test instructions](TEST_INSTRUCTIONS.md) alongside each release. Before submission, update the access arrangement and copy the reviewer section into the Chrome Web Store Test instructions field. Keep credentials out of the repository. The instructions document is not included in the runtime ZIP; authenticated reviewer access must be arranged separately.
