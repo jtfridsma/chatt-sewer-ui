@@ -25,3 +25,6 @@ dist/
 
 # Sass cache
 .sass-cache/
+
+# Local demo assets
+.local/

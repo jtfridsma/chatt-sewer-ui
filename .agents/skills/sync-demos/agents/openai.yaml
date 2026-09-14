@@ -1,0 +1,6 @@
+interface:
+    display_name: 'Sync demos'
+    short_description: 'Manually sync public and local dashboard demos'
+    default_prompt: 'Use $sync-demos to update the public and local enhanced demos for the current app changes, preserving the original-portal comparison baseline.'
+policy:
+    allow_implicit_invocation: false
