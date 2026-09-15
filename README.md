@@ -107,12 +107,12 @@ Build toolchain:
 ### Updating the version
 
 1. Run `npm version patch --no-git-tag-version` (or `minor`, `major`, or an exact version).
-2. The npm `version` hook syncs `manifest.json` automatically. Update release references in `TEST_INSTRUCTIONS.md`, other documentation, and the version fallbacks in `src/scripts/components/theme-toggle.js`.
+2. The npm `version` hook syncs `manifest.json` automatically. Update release references in `docs/TEST_INSTRUCTIONS.md`, other documentation, and the version fallbacks in `src/scripts/components/theme-toggle.js`.
 3. Review and commit the three version files and updated references together.
 
 Use numeric versions without prerelease suffixes such as `-beta.1`. The flag prevents automatic Git commits and tags. Packaging does not bump versions or publish; rebuild the same release without bumping again.
 
-For agent-assisted preparation, ask: `Use $prepare-release to prepare a patch release.` The [project skill](.agents/skills/prepare-release/SKILL.md) handles the bump, reference updates, and package checks without committing or publishing. If the version hook fails, inspect the version files before retrying; npm may already have applied the bump.
+For agent-assisted preparation, ask: `Use $prepare-release to prepare a patch release.` The [project skill](.agents/skills/prepare-release/SKILL.md) handles the bump, reference updates, package checks, and version-pinned store submission documents without committing or publishing. After packaging, it generates `STORE_LISTING.md`, `STORE_DISCLOSURES.md`, and a copy of `docs/TEST_INSTRUCTIONS.md` in `dist/submission-v<VERSION>/`, beside the ZIP. These contain listing copy, permission/data-use explanations, and reviewer instructions, with unresolved submission details separated from copy-ready text. Running `npm run package` alone does not generate these documents and clears previous output in `dist/`. If the version hook fails, inspect the version files before retrying; npm may already have applied the bump.
 
 ### Creating the archive
 
@@ -120,4 +120,4 @@ Run `npm run package` to create a distributable extension archive. The command r
 
 The ZIP contains `manifest.json` at its root and can be submitted or shared without the source tree, development dependencies, or stale unreferenced build output.
 
-Maintain [reviewer test instructions](TEST_INSTRUCTIONS.md) alongside each release. Before submission, update the access arrangement and copy the reviewer section into the Chrome Web Store Test instructions field. Keep credentials out of the repository. The instructions document is not included in the runtime ZIP; authenticated reviewer access must be arranged separately.
+Maintain [reviewer test instructions](docs/TEST_INSTRUCTIONS.md) alongside each release. Before submission, update the access arrangement and copy the reviewer section into the Chrome Web Store Test instructions field. Keep credentials out of the repository. The instructions document is not included in the runtime ZIP; authenticated reviewer access must be arranged separately.

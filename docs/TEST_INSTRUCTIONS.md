@@ -1,6 +1,6 @@
 # Chrome Web Store reviewer instructions
 
-Last updated: September 11, 2026. Prepared for extension version 0.1.0.
+Last updated: September 15, 2026. Prepared for extension version 0.1.0.
 
 ## Maintainer: prepare each submission
 
