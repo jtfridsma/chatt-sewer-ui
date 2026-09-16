@@ -96,7 +96,7 @@ html.csui-theme {
 
     // Move the wave within the stationary circular mask (SVG viewBox units).
     .csui-control__launcher-icon-wave {
-        transform: translate(-82px, 82px);
+        transform: translate(-41px, 82px);
         transition: transform 500ms ease-in-out;
     }
 
@@ -105,7 +105,7 @@ html.csui-theme {
 
         // Fill on first render, using the same interruptible transition as toggles.
         @starting-style {
-            transform: translate(-82px, 82px);
+            transform: translate(-41px, 82px);
         }
     }
 
