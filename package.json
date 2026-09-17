@@ -19,6 +19,7 @@
     "dev:css": "sass --watch src/styles/main.scss public/main.css --no-source-map",
     "dev:js": "node build.mjs --watch",
     "dev": "npm-run-all --parallel dev:css dev:js",
+    "demo": "pbcopy < scripts/recording-redaction.js",
     "lint": "prettier --check .",
     "test": "node --test",
     "format": "prettier --write .",

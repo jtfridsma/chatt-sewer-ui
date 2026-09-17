@@ -99,6 +99,10 @@ html[data-csui-enabled].csui-theme.csui-webshare.csui-webshare-forgot-username {
         @include mixins.error-message;
     }
 
+    div:has(> .error_label:not(:empty)) {
+        margin-top: 1rem;
+    }
+
     // Button containers
     td[align='center']:has(input[type='submit']) {
         display: block;

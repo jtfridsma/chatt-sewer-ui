@@ -1,6 +1,6 @@
 # Chrome Web Store reviewer instructions
 
-Last updated: September 15, 2026. Prepared for extension version 0.1.0.
+Last updated: September 16, 2026. Prepared for extension version 0.1.0.
 
 ## Maintainer: prepare each submission
 
@@ -16,9 +16,13 @@ instructions in a ZIP is not a substitute for completing the dashboard field.
   dashboard fields. Never commit passwords, session cookies, real customer records, or private
   statement URLs to this file or the repository.
 - Verify access from a fresh browser session. Keep it available throughout review and any follow-up.
-- If supplying a recording, add its accessible URL below after checking every frame for personal
-  information, account identifiers, statement URLs, and payment details.
+- Provide a redacted walkthrough video and replace the video-link placeholder below before
+  submission. Check every frame for personal information, account identifiers, statement URLs,
+  and payment details, and verify that reviewers can open the link.
 - Refresh the public steps, expected results, and source map whenever functionality changes.
+- Keep store images and captions in `.local/store-assets/v<VERSION>/` as described in the README's
+  **Store images and captions** section. Release preparation stages them beside the submission
+  documents; they are separate from the walkthrough video and runtime ZIP.
 
 Creating these instructions does not establish authenticated access. No provider test account or
 sanctioned sandbox has been arranged. A bundled synthetic demo is available through Extension options.
@@ -30,6 +34,7 @@ sanctioned sandbox has been arranged. A bundled synthetic demo is available thro
 Chattanooga Sewer UI Enhancer is an independent desktop Chrome extension. It improves presentation
 on the Chattanooga landing page at https://www.sewerpayments.com/chattanooga and the Chattanooga
 tenant of https://share.dwcorp.com/WebShare/ (also matching lowercase /webshare/).
+
 The WebShare URL must contain clientKey=3652. viewID=3 is customary but is not required by the
 extension. The extension has no toolbar popup; its live control appears inside supported pages.
 Its Extension options page opens the synthetic dashboard demo described below.
@@ -46,8 +51,18 @@ have not been verified here. Reviewers should not need a local address or invent
 
 The bundled demo provides synthetic accounts and consumption history for interactive dashboard UI
 review without credentials or a local address. Live statement retrieval, authentication, Angular
-integration, and authenticated modals still require an authorized portal account. No demonstration
-recording is currently supplied. The demo does not establish that live integration has passed review.
+integration, and authenticated modals still require an authorized portal account for interactive
+testing. The redacted walkthrough video below supplements the demo with recorded portal behavior.
+The demo and video do not establish that live integration has passed review.
+
+### Walkthrough video
+
+**Video link:** [REPLACE WITH ACCESSIBLE WALKTHROUGH VIDEO URL BEFORE SUBMISSION]
+
+The video shows the submitted extension version, the populated dashboard, tab changes, enhancement
+toggles, and portal modal opening/cancellation. Personal and account identifiers are visually masked.
+Any unavailable scenarios are explained in the recording. Use the synthetic demo below for
+interactive exploration; the video does not provide authenticated access or verify payment outcomes.
 
 ### Synthetic dashboard — no login or local account needed
 
@@ -92,6 +107,7 @@ entry: public/demo/index.html. It is included in the submitted product and avail
 Use these steps only when the submission provides suitable access. On a real account, limit review
 to viewing and opening/cancelling dialogs. Do not submit payments, change credentials, delete saved
 payment methods, or toggle billing settings. Billing-setting changes may save immediately.
+
 Execute write tests only in a provider-approved test environment explicitly designated for them.
 
 1. Sign in through the portal with the supplied credentials. Expect the enhanced dashboard after

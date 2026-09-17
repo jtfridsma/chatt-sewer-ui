@@ -51,6 +51,28 @@ Notes:
 - Bundled fonts and their licenses are committed in `public/fonts/`: Inter and Gabarito use the SIL Open Font License; Material Symbols uses Apache License 2.0. See `public/fonts/MaterialSymbols-README.txt` before adding icons to the subset.
 - While `npm run dev` is running, reload the target page to see updates (Chrome may require reloading the extension after JS changes).
 
+## Recording-only redaction helper (macOS)
+
+`pnpm demo` (or `npm run demo`) copies `scripts/recording-redaction.js` to the clipboard;
+it does not build the extension, launch the synthetic demo, or inject anything into a browser.
+
+1. Review the preconfigured `pageSelectors` for original portal elements and `dashboardSelectors`
+   for elements inside the enhanced dashboard's shadow root. Adjust selectors as needed for the
+   views you plan to record. Select text containers; for inputs or images, select a suitable wrapper. Do not put real
+   account values or credentials in the script.
+2. Run `pnpm demo`, then paste into **DevTools → Sources → Snippets**, save, and run on the portal.
+   After editing the file, copy it again and replace the saved snippet.
+3. Masks follow matching elements and recreated dashboard roots. Rehearse account switches,
+   enhancement toggles, and modals before recording. These are visual masks, not data removal;
+   URLs, separate statement tabs, and iframe contents are not covered.
+4. Rerun the saved snippet after a full page reload. To remove masks without reloading, run
+   `window.csuiRecordingRedaction?.stop()` in the console. To reapply after stopping, rerun the
+   saved snippet; stopping removes the helper API.
+
+The helper stays in `scripts/`, outside the build entry points and the packager's selected
+`public/` assets. Do not import it from extension source or add it to the manifest. Private
+local notes belong under the Git-ignored `.local/` directory.
+
 ## Project rules
 
 - Keep it plain JavaScript. No framework, no TypeScript, no runtime abstraction layer.
@@ -113,6 +135,12 @@ Build toolchain:
 Use numeric versions without prerelease suffixes such as `-beta.1`. The flag prevents automatic Git commits and tags. Packaging does not bump versions or publish; rebuild the same release without bumping again.
 
 For agent-assisted preparation, ask: `Use $prepare-release to prepare a patch release.` The [project skill](.agents/skills/prepare-release/SKILL.md) handles the bump, reference updates, package checks, and version-pinned store submission documents without committing or publishing. After packaging, it generates `STORE_LISTING.md`, `STORE_DISCLOSURES.md`, and a copy of `docs/TEST_INSTRUCTIONS.md` in `dist/submission-v<VERSION>/`, beside the ZIP. These contain listing copy, permission/data-use explanations, and reviewer instructions, with unresolved submission details separated from copy-ready text. Running `npm run package` alone does not generate these documents and clears previous output in `dist/`. If the version hook fails, inspect the version files before retrying; npm may already have applied the bump.
+
+### Store images and captions
+
+Keep supplied store screenshots, the store icon, promotional artwork, and `captions.md` in `.local/store-assets/v<VERSION>/` (initial release: `.local/store-assets/v0.1.0/`). Use a numbered list in `captions.md`, with one filename and caption per screenshot in upload order. List other assets separately. This directory is Git-ignored and survives packaging; keep a separate backup of the originals.
+
+The release preparation skill reads that version's assets and captions, includes the captions in `STORE_LISTING.md`, and copies the supplied files to `dist/submission-v<VERSION>/store-assets/` after packaging. Store assets are uploaded separately from the extension ZIP. `npm run package` alone does not copy them and clears previous submission output in `dist/`. For a later release, supply the matching asset directory or explicitly choose an earlier set to reuse.
 
 ### Creating the archive
 
